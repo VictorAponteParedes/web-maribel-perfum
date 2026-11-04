@@ -1,35 +1,68 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from 'react';
+import { HomeScreen } from './features/home';
+import { CheckoutScreen } from './features/checkout';
+import { CombosScreen } from './features/combos';
+import { CatalogScreen } from './features/catalog';
 
-function App() {
-  const [count, setCount] = useState(0)
+type ViewMode = 'home' | 'combos' | 'catalog' | 'checkout';
+
+export const App: React.FC = () => {
+  const [currentView, setCurrentView] = useState<ViewMode>('home');
+  const [catalogInitialCategory, setCatalogInitialCategory] = useState<string>('Todos');
+
+  const handleNavigateToCatalog = (category: string = 'Todos') => {
+    setCatalogInitialCategory(category);
+    setCurrentView('catalog');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleNavigateToCombos = () => {
+    setCurrentView('combos');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleNavigateToCheckout = () => {
+    setCurrentView('checkout');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleBackToHome = () => {
+    setCurrentView('home');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  if (currentView === 'checkout') {
+    return <CheckoutScreen onBack={handleBackToHome} />;
+  }
+
+  if (currentView === 'combos') {
+    return (
+      <CombosScreen
+        onBack={handleBackToHome}
+        onNavigateToCheckout={handleNavigateToCheckout}
+        onNavigateToCatalog={() => handleNavigateToCatalog('Todos')}
+      />
+    );
+  }
+
+  if (currentView === 'catalog') {
+    return (
+      <CatalogScreen
+        initialCategory={catalogInitialCategory}
+        onBack={handleBackToHome}
+        onNavigateToCheckout={handleNavigateToCheckout}
+        onNavigateToCombos={handleNavigateToCombos}
+      />
+    );
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <HomeScreen
+      onNavigateToCheckout={handleNavigateToCheckout}
+      onNavigateToCombos={handleNavigateToCombos}
+      onNavigateToCatalog={handleNavigateToCatalog}
+    />
+  );
+};
 
-export default App
+export default App;

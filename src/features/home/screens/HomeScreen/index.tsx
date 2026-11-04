@@ -2,13 +2,10 @@ import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { BottomNav, NavTab } from '@/components/layout/BottomNav';
-import { FloatingCartBar } from '@/components/layout/FloatingCartBar';
 import { HeroCampaignBanner } from '@/features/home/components/HeroCampaignBanner';
 import { CombosSection } from '@/features/home/components/CombosSection';
 import { CategoryFilterPills } from '@/features/home/components/CategoryFilterPills';
 import { ProductCard } from '@/features/home/components/ProductCard';
-import { CartDrawer } from '@/features/cart/components/CartDrawer';
 import { useHomeData } from '@/features/home/hooks/useHomeData';
 import { Sparkles, SlidersHorizontal, ArrowRight } from 'lucide-react';
 import { WebRoutes } from '@/navigation/routes';
@@ -37,7 +34,7 @@ export const HomeScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50/50 flex flex-col">
+    <div className="min-h-screen bg-stone-50/50 flex flex-col pb-20 md:pb-0">
       {/* Full Width Sticky Header */}
       <Header
         searchQuery={searchQuery}
@@ -123,21 +120,6 @@ export const HomeScreen: React.FC = () => {
 
       {/* Footer */}
       <Footer />
-
-      {/* Floating Cart Button */}
-      <FloatingCartBar />
-
-      {/* Mobile-Only Bottom Navigation */}
-      <BottomNav
-        activeTab="catalogo"
-        onTabChange={(tab: NavTab) => {
-          if (tab === 'regalos') navigate(WebRoutes.COMBOS);
-          if (tab === 'catalogo') navigate(WebRoutes.CATALOG);
-        }}
-      />
-
-      {/* Cart Drawer */}
-      <CartDrawer onProceedToCheckout={() => navigate(WebRoutes.CHECKOUT)} />
     </div>
   );
 };

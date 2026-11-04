@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Gift, Tag } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { FloatingCartBar } from '@/components/layout/FloatingCartBar';
-import { CartDrawer } from '@/features/cart/components/CartDrawer';
 import { ComboCard } from '@/features/home/components/ComboCard';
 import { ALL_COMBOS } from '../../data/combos.data';
 import { WebRoutes } from '@/navigation/routes';
@@ -32,7 +30,7 @@ export const CombosScreen: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-stone-50/50 flex flex-col">
+    <div className="min-h-screen bg-stone-50/50 flex flex-col pb-20 md:pb-0">
       <Header
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -110,8 +108,6 @@ export const CombosScreen: React.FC = () => {
       </main>
 
       <Footer />
-      <FloatingCartBar />
-      <CartDrawer onProceedToCheckout={() => navigate(WebRoutes.CHECKOUT)} />
     </div>
   );
 };

@@ -12,33 +12,22 @@ export const FloatingCartBar: React.FC = () => {
 
   return (
     <>
-      {/* Mobile Floating Pill (Visible only on < md) */}
-      <aside aria-label="Resumen de compra rápida" className="md:hidden fixed bottom-20 left-4 right-4 z-40 max-w-md mx-auto pointer-events-auto">
-        <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-stone-200/90 shadow-[0_10px_25px_-5px_rgba(90,6,26,0.15)] p-2.5 px-3.5 flex items-center justify-between transition-all animate-in slide-in-from-bottom-4 duration-300">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center text-[#5a061a]">
-              <ShoppingBag className="w-5 h-5 stroke-[2]" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[10px] text-stone-500 font-medium leading-none">
-                Total estimado
-              </span>
-              <span className="text-sm font-bold text-[#5a061a] leading-tight mt-0.5">
-                {formatCurrency(totalPrice)}
-              </span>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={openDrawer}
-            className="bg-[#5a061a] hover:bg-[#720c24] active:scale-95 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-1.5 shadow-md shadow-[#5a061a]/25 transition-all cursor-pointer"
-          >
-            <span>Ver Carrito ({itemsCount})</span>
-            <span className="text-sm">🛍️</span>
-            <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-          </button>
-        </div>
+      {/* Mobile Floating Circular Cart Button (Generous Touch Target & High Visibility) */}
+      <aside
+        aria-label="Bolsa de compra rápida"
+        className="md:hidden fixed bottom-20 right-4 z-40 pointer-events-auto"
+      >
+        <button
+          type="button"
+          onClick={openDrawer}
+          className="w-15 h-15 w-[60px] h-[60px] bg-[#5a061a] hover:bg-[#720c24] active:scale-95 text-white rounded-full shadow-[0_10px_30px_rgba(90,6,26,0.45)] border-2 border-white flex items-center justify-center transition-all cursor-pointer relative"
+          aria-label={`Ver bolsa con ${itemsCount} productos`}
+        >
+          <ShoppingBag className="w-7 h-7 stroke-[2.2]" />
+          <span className="absolute -top-1 -right-1 bg-amber-400 text-stone-950 text-xs font-black w-6 h-6 rounded-full flex items-center justify-center shadow-md border-2 border-white">
+            {itemsCount}
+          </span>
+        </button>
       </aside>
 
       {/* Desktop Floating Shortcut (Bottom Right) */}

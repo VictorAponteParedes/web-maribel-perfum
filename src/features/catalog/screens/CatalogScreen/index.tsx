@@ -3,8 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Sparkles, SlidersHorizontal } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { FloatingCartBar } from '@/components/layout/FloatingCartBar';
-import { CartDrawer } from '@/features/cart/components/CartDrawer';
 import { ProductCard } from '@/features/home/components/ProductCard';
 import { CategoryFilterPills } from '@/features/home/components/CategoryFilterPills';
 import { Pagination } from '@/components/ui/Pagination';
@@ -21,20 +19,18 @@ export const CatalogScreen: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>(categoryFromUrl);
   const [sortBy, setSortBy] = useState<'default' | 'price_asc' | 'price_desc'>('default');
 
-  // Paginación (igual que en el panel admin, sin scroll infinito)
+  // Paginación
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(8);
 
   const categories = ['Todos', 'Femenino', 'Masculino', 'Árabe', 'Unisex'];
 
-  // Sincronizar parámetro URL si cambia externamente
   useEffect(() => {
     if (categoryFromUrl) {
       setActiveCategory(categoryFromUrl);
     }
   }, [categoryFromUrl]);
 
-  // Reset a página 1 al cambiar filtros o búsqueda
   useEffect(() => {
     setCurrentPage(1);
   }, [activeCategory, searchQuery, sortBy]);
@@ -71,7 +67,7 @@ export const CatalogScreen: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-stone-50/50 flex flex-col">
+    <div className="min-h-screen bg-stone-50/50 flex flex-col pb-20 md:pb-0">
       <Header
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -131,7 +127,7 @@ export const CatalogScreen: React.FC = () => {
           </div>
         </div>
 
-        {/* Products Grid (4 cols on desktop) */}
+        {/* Products Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 sm:gap-6">
           {paginatedProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
@@ -171,8 +167,6 @@ export const CatalogScreen: React.FC = () => {
       </main>
 
       <Footer />
-      <FloatingCartBar />
-      <CartDrawer onProceedToCheckout={() => navigate(WebRoutes.CHECKOUT)} />
     </div>
   );
 };

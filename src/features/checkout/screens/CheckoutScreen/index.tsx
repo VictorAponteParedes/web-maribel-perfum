@@ -38,8 +38,7 @@ export const CheckoutScreen: React.FC = () => {
       reference: 'Casa con portón negro y rejas doradas',
       latitude: -25.2867,
       longitude: -57.6470,
-      paymentMethod: 'CASH_ON_DELIVERY',
-      cashAmountToPayWith: '350.000',
+      paymentMethod: 'SIPAP_TRANSFER',
       giftNote: '',
     },
     mode: 'onTouched',
@@ -71,18 +70,13 @@ export const CheckoutScreen: React.FC = () => {
       (data.deliveryType === 'DELIVERY' ? `📍 *Dirección:* ${data.address}\n` : '') +
       (data.reference ? `🏡 *Referencia:* ${data.reference}\n` : '') +
       gpsLink +
-      `\n💳 *Forma de Pago:* ${
-        data.paymentMethod === 'CASH_ON_DELIVERY'
-          ? `Efectivo contra entrega ${data.cashAmountToPayWith ? `(Paga con Gs. ${data.cashAmountToPayWith})` : ''}`
-          : data.paymentMethod === 'SIPAP_TRANSFER'
-          ? 'Transferencia Bancaria SIPAP'
-          : 'QR Bancard o Tarjeta al recibir'
-      }\n` +
+      `\n💳 *Forma de Pago:* Transferencia Bancaria SIPAP\n` +
+      `💬 *Estado:* Aguardo los datos de cuenta bancaria para transferir y validar el despacho.\n` +
       (data.giftNote ? `💌 *Dedicatoria de regalo:* "${data.giftNote}"\n` : '') +
-      `\n📦 *Productos:* \n${itemsSummary}\n\n` +
+      `\n📦 *Productos reservados:* \n${itemsSummary}\n\n` +
       `💰 *Subtotal:* ${formatCurrency(subtotal)}\n` +
       `🚚 *Envío:* ${deliveryFee === 0 ? 'Gratis' : formatCurrency(deliveryFee)}\n` +
-      `✨ *Total a Pagar:* ${formatCurrency(total)}`
+      `✨ *Total a Transferir:* ${formatCurrency(total)}`
     );
 
     const whatsappUrl = `https://wa.me/595981000000?text=${whatsappMessage}`;
@@ -97,8 +91,7 @@ export const CheckoutScreen: React.FC = () => {
       reference: data.reference,
       coordinates:
         data.latitude && data.longitude ? { lat: data.latitude, lng: data.longitude } : null,
-      paymentMethod: data.paymentMethod,
-      cashAmountToPayWith: data.cashAmountToPayWith,
+      paymentMethod: 'SIPAP_TRANSFER',
       giftNote: data.giftNote,
       subtotal,
       deliveryFee,
@@ -183,8 +176,8 @@ export const CheckoutScreen: React.FC = () => {
               {/* Step 2: Delivery */}
               <DeliveryStep control={control} watch={watch} setValue={setValue} />
 
-              {/* Step 3: Payment */}
-              <PaymentStep control={control} watch={watch} setValue={setValue} />
+              {/* Step 3: Payment (SIPAP Only) */}
+              <PaymentStep />
             </div>
 
             {/* Right Column: Order Summary (5 cols on desktop) */}

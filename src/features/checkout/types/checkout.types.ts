@@ -1,6 +1,6 @@
 export type DeliveryType = 'DELIVERY' | 'PICKUP';
 
-export type PaymentMethod = 'CASH_ON_DELIVERY' | 'SIPAP_TRANSFER' | 'POS_CARD_OR_QR';
+export type PaymentMethod = 'SIPAP_TRANSFER';
 
 export interface CityOption {
   id: string;
@@ -18,7 +18,6 @@ export interface CheckoutFormValues {
   latitude?: number | null;
   longitude?: number | null;
   paymentMethod: PaymentMethod;
-  cashAmountToPayWith: string;
   giftNote?: string;
 }
 
@@ -32,7 +31,6 @@ export interface ConfirmedOrderData {
   reference: string;
   coordinates?: { lat: number; lng: number } | null;
   paymentMethod: PaymentMethod;
-  cashAmountToPayWith?: string;
   giftNote?: string;
   subtotal: number;
   deliveryFee: number;

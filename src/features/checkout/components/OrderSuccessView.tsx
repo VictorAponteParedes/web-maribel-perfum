@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, MessageCircle, ArrowLeft } from 'lucide-react';
+import { CheckCircle2, MessageCircle, ArrowLeft, Landmark, Sparkles } from 'lucide-react';
 import { ConfirmedOrderData } from '../types/checkout.types';
 import { formatCurrency } from '@/utils/formatCurrency';
 
@@ -20,14 +20,20 @@ export const OrderSuccessView: React.FC<OrderSuccessViewProps> = ({ orderData, o
         {/* Heading */}
         <div>
           <span className="text-xs font-bold tracking-widest text-emerald-700 uppercase bg-emerald-50 px-3 py-1 rounded-full">
-            ¡Pedido Registrado con Éxito!
+            ¡Pedido Reservado con Éxito!
           </span>
           <h2 className="font-serif text-3xl sm:text-4xl font-bold text-stone-900 mt-3 tracking-tight">
             Orden #{orderData.orderNumber}
           </h2>
-          <p className="text-stone-500 text-sm mt-2 max-w-md mx-auto leading-relaxed">
-            Gracias por elegir Maribel Perfumería. Tu solicitud ya ingresó a nuestro sistema y preparamos tu paquete con empaque de lujo.
-          </p>
+          <div className="mt-3 p-4 rounded-2xl bg-[#fdfbf7] border border-[#f5ebd7] text-xs sm:text-sm text-stone-700 max-w-md mx-auto leading-relaxed text-left space-y-2">
+            <p className="flex items-center gap-2 font-bold text-[#5a061a]">
+              <Sparkles className="w-4 h-4 text-amber-500" />
+              <span>¿Qué sucederá ahora?</span>
+            </p>
+            <p>
+              Una de nuestras asesoras <strong>te escribirá de inmediato a tu WhatsApp (+595 {orderData.phone})</strong> para facilitarte los datos de la cuenta bancaria, verificar tu comprobante de transferencia y coordinar la entrega de tu paquete.
+            </p>
+          </div>
         </div>
 
         {/* WhatsApp Big CTA Button */}
@@ -39,10 +45,10 @@ export const OrderSuccessView: React.FC<OrderSuccessViewProps> = ({ orderData, o
             className="w-full bg-[#25D366] hover:bg-[#20ba59] active:scale-[0.99] text-white font-bold text-base py-4 px-6 rounded-2xl flex items-center justify-center gap-3 shadow-xl shadow-emerald-600/25 transition-all cursor-pointer"
           >
             <MessageCircle className="w-6 h-6 fill-current" />
-            <span>Confirmar Despacho por WhatsApp ahora</span>
+            <span>Hablar con la asesora por WhatsApp</span>
           </a>
           <p className="text-xs text-stone-400 mt-2">
-            Te redirige a nuestro chat oficial con los detalles del pedido cargados.
+            Si deseas agilizar el proceso, presiona el botón para enviarle los datos de tu orden directamente.
           </p>
         </div>
 
@@ -67,28 +73,16 @@ export const OrderSuccessView: React.FC<OrderSuccessViewProps> = ({ orderData, o
             </span>
           </div>
 
-          {orderData.coordinates && (
-            <div className="flex items-center justify-between pb-3 border-b border-stone-200/70">
-              <span className="text-stone-500">GPS Satelital:</span>
-              <span className="font-mono text-xs text-[#9b7036] font-bold">
-                {orderData.coordinates.lat}, {orderData.coordinates.lng}
-              </span>
-            </div>
-          )}
-
           <div className="flex items-center justify-between pb-3 border-b border-stone-200/70">
-            <span className="text-stone-500">Método de Pago:</span>
-            <span className="font-semibold text-stone-900">
-              {orderData.paymentMethod === 'CASH_ON_DELIVERY'
-                ? `Efectivo contra entrega ${orderData.cashAmountToPayWith ? `(Paga con Gs. ${orderData.cashAmountToPayWith})` : ''}`
-                : orderData.paymentMethod === 'SIPAP_TRANSFER'
-                ? 'Transferencia Bancaria SIPAP'
-                : 'QR Bancard o Tarjeta al recibir'}
+            <span className="text-stone-500">Forma de Pago:</span>
+            <span className="font-semibold text-stone-900 flex items-center gap-1.5">
+              <Landmark className="w-4 h-4 text-[#5a061a]" />
+              <span>Transferencia Bancaria SIPAP (A coordinar)</span>
             </span>
           </div>
 
           <div className="flex items-center justify-between pt-1">
-            <span className="font-serif font-bold text-base text-stone-900">Monto Total:</span>
+            <span className="font-serif font-bold text-base text-stone-900">Total a Transferir:</span>
             <span className="font-serif font-bold text-xl text-[#5a061a]">
               {formatCurrency(orderData.total)}
             </span>

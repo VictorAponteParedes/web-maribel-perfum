@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Plus, Check } from 'lucide-react';
 import { Combo } from '@/types/product.types';
 import { formatCurrency } from '@/utils/formatCurrency';
@@ -28,7 +29,11 @@ export const ComboCard: React.FC<ComboCardProps> = ({ combo }) => {
   };
 
   return (
-    <article className="w-full bg-white rounded-2xl border border-stone-200/90 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group">
+    <motion.article
+      whileHover={{ y: -5 }}
+      transition={{ duration: 0.25, ease: 'easeOut' }}
+      className="w-full bg-white rounded-2xl border border-stone-200/90 shadow-xs hover:shadow-xl transition-shadow duration-300 flex flex-col overflow-hidden group"
+    >
       {/* Image Container with Badges */}
       <div className="relative aspect-[16/10] bg-stone-100 overflow-hidden">
         <img
@@ -101,6 +106,6 @@ export const ComboCard: React.FC<ComboCardProps> = ({ combo }) => {
           </button>
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 };

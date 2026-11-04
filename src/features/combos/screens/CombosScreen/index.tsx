@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Gift, Tag } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
@@ -6,18 +7,10 @@ import { FloatingCartBar } from '@/components/layout/FloatingCartBar';
 import { CartDrawer } from '@/features/cart/components/CartDrawer';
 import { ComboCard } from '@/features/home/components/ComboCard';
 import { ALL_COMBOS } from '../../data/combos.data';
+import { WebRoutes } from '@/navigation/routes';
 
-interface CombosScreenProps {
-  onBack: () => void;
-  onNavigateToCheckout: () => void;
-  onNavigateToCatalog: () => void;
-}
-
-export const CombosScreen: React.FC<CombosScreenProps> = ({
-  onBack,
-  onNavigateToCheckout,
-  onNavigateToCatalog,
-}) => {
+export const CombosScreen: React.FC = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState<string>('Todos');
 
@@ -44,7 +37,7 @@ export const CombosScreen: React.FC<CombosScreenProps> = ({
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         onScrollToCombos={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        onSelectCategory={() => onNavigateToCatalog()}
+        onSelectCategory={(cat) => navigate(`${WebRoutes.CATALOG}?categoria=${cat}`)}
       />
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
@@ -52,7 +45,7 @@ export const CombosScreen: React.FC<CombosScreenProps> = ({
         <div className="mb-8">
           <button
             type="button"
-            onClick={onBack}
+            onClick={() => navigate(WebRoutes.HOME)}
             className="inline-flex items-center gap-2 text-stone-600 hover:text-stone-900 font-semibold text-xs sm:text-sm py-1.5 px-3 rounded-xl hover:bg-stone-100 transition-colors cursor-pointer mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -118,7 +111,7 @@ export const CombosScreen: React.FC<CombosScreenProps> = ({
 
       <Footer />
       <FloatingCartBar />
-      <CartDrawer onProceedToCheckout={onNavigateToCheckout} />
+      <CartDrawer onProceedToCheckout={() => navigate(WebRoutes.CHECKOUT)} />
     </div>
   );
 };

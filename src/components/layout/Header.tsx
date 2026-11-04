@@ -1,22 +1,25 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ShoppingBag, Search, Sparkles, X, MessageCircle, Gift } from 'lucide-react';
 import { useCartStore } from '@/features/cart/store/useCartStore';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { logoAdmin } from '@/assets';
+import { WebRoutes } from '@/navigation/routes';
 
 interface HeaderProps {
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
   onScrollToCombos?: () => void;
   onSelectCategory?: (category: string) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  searchQuery,
+  searchQuery = '',
   onSearchChange,
   onScrollToCombos,
   onSelectCategory,
 }) => {
+  const navigate = useNavigate();
   const totalItemsCount = useCartStore((state) => state.getTotalItemsCount());
   const totalPrice = useCartStore((state) => state.getTotalPrice());
   const openDrawer = useCartStore((state) => state.openDrawer);
@@ -26,6 +29,27 @@ export const Header: React.FC<HeaderProps> = ({
       'https://wa.me/595981000000?text=Hola%20Maribel%20Perfumer%C3%ADa,%20me%20gustar%C3%ADa%20recibir%20asesor%C3%ADa%20personalizada%20sobre%20fragancias%20y%20regalos',
       '_blank'
     );
+  };
+
+  const handleLogoClick = () => {
+    navigate(WebRoutes.HOME);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCategoryNav = (cat: string) => {
+    if (onSelectCategory) {
+      onSelectCategory(cat);
+    } else {
+      navigate(`${WebRoutes.CATALOG}?categoria=${cat}`);
+    }
+  };
+
+  const handleCombosNav = () => {
+    if (onScrollToCombos) {
+      onScrollToCombos();
+    } else {
+      navigate(WebRoutes.COMBOS);
+    }
   };
 
   return (
@@ -43,7 +67,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Brand Logo with Official Image Icon */}
         <div
           className="flex items-center gap-3 cursor-pointer group"
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          onClick={handleLogoClick}
         >
           <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden shadow-md shadow-[#5a061a]/25 flex-shrink-0 border border-stone-200/80 group-hover:scale-105 transition-transform">
             <img
@@ -68,11 +92,11 @@ export const Header: React.FC<HeaderProps> = ({
           <input
             type="text"
             value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
+            onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
             placeholder="Buscar por fragancia, marca o notas olfativas..."
             className="w-full bg-stone-50 border border-stone-200 rounded-full pl-10 pr-9 py-2.5 text-sm text-stone-800 placeholder:text-stone-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#880e2b]/15 focus:border-[#880e2b] transition-all"
           />
-          {searchQuery.length > 0 && (
+          {searchQuery.length > 0 && onSearchChange && (
             <button
               type="button"
               onClick={() => onSearchChange('')}
@@ -87,7 +111,7 @@ export const Header: React.FC<HeaderProps> = ({
         <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold text-stone-600">
           <button
             type="button"
-            onClick={onScrollToCombos}
+            onClick={handleCombosNav}
             className="hover:text-[#5a061a] flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <Gift className="w-4 h-4 text-[#9b7036]" />
@@ -95,21 +119,21 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
           <button
             type="button"
-            onClick={() => onSelectCategory && onSelectCategory('Femenino')}
+            onClick={() => handleCategoryNav('Femenino')}
             className="hover:text-[#5a061a] transition-colors cursor-pointer"
           >
             Femeninos
           </button>
           <button
             type="button"
-            onClick={() => onSelectCategory && onSelectCategory('Masculino')}
+            onClick={() => handleCategoryNav('Masculino')}
             className="hover:text-[#5a061a] transition-colors cursor-pointer"
           >
             Masculinos
           </button>
           <button
             type="button"
-            onClick={() => onSelectCategory && onSelectCategory('Árabe')}
+            onClick={() => handleCategoryNav('Árabe')}
             className="hover:text-[#5a061a] transition-colors cursor-pointer"
           >
             Árabes
@@ -151,7 +175,7 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </button>
 
-          {/* Mobile Avatar Emblem Button matching mockup */}
+          {/* Mobile Avatar Emblem Button */}
           <div className="sm:hidden w-8 h-8 rounded-full overflow-hidden shadow-sm border border-stone-200">
             <img src={logoAdmin} alt="Maribel Icono" className="w-full h-full object-cover" />
           </div>
@@ -159,27 +183,29 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Mobile Search Input */}
-      <div className="md:hidden px-4 pb-3">
-        <div className="relative">
-          <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Buscar por fragancia, marca..."
-            className="w-full bg-stone-50 border border-stone-200 rounded-xl pl-10 pr-9 py-2 text-xs text-stone-800 placeholder:text-stone-400 shadow-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#880e2b]/15 focus:border-[#880e2b]"
-          />
-          {searchQuery.length > 0 && (
-            <button
-              type="button"
-              onClick={() => onSearchChange('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 p-0.5 rounded-full"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
+      {onSearchChange && (
+        <div className="md:hidden px-4 pb-3">
+          <div className="relative">
+            <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              placeholder="Buscar por fragancia, marca..."
+              className="w-full bg-stone-50 border border-stone-200 rounded-xl pl-10 pr-9 py-2 text-xs text-stone-800 placeholder:text-stone-400 shadow-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#880e2b]/15 focus:border-[#880e2b]"
+            />
+            {searchQuery.length > 0 && (
+              <button
+                type="button"
+                onClick={() => onSearchChange('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 p-0.5 rounded-full"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </header>
   );
 };

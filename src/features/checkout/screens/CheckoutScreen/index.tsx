@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { ArrowLeft, Zap, Lock } from 'lucide-react';
 import { useCartStore } from '@/features/cart/store/useCartStore';
@@ -11,12 +12,10 @@ import { OrderSummaryCard } from '../../components/OrderSummaryCard';
 import { OrderSuccessView } from '../../components/OrderSuccessView';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { logoAdmin } from '@/assets';
+import { WebRoutes } from '@/navigation/routes';
 
-interface CheckoutScreenProps {
-  onBack: () => void;
-}
-
-export const CheckoutScreen: React.FC<CheckoutScreenProps> = ({ onBack }) => {
+export const CheckoutScreen: React.FC = () => {
+  const navigate = useNavigate();
   const items = useCartStore((state) => state.items);
   const subtotal = useCartStore((state) => state.getTotalPrice());
   const clearCart = useCartStore((state) => state.clearCart);
@@ -120,7 +119,15 @@ export const CheckoutScreen: React.FC<CheckoutScreenProps> = ({ onBack }) => {
   };
 
   if (confirmedOrder) {
-    return <OrderSuccessView orderData={confirmedOrder} onBackToHome={onBack} />;
+    return (
+      <OrderSuccessView
+        orderData={confirmedOrder}
+        onBackToHome={() => {
+          navigate(WebRoutes.HOME);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
+    );
   }
 
   return (
@@ -131,7 +138,7 @@ export const CheckoutScreen: React.FC<CheckoutScreenProps> = ({ onBack }) => {
           {/* Back button */}
           <button
             type="button"
-            onClick={onBack}
+            onClick={() => navigate(WebRoutes.HOME)}
             className="inline-flex items-center gap-2 text-stone-600 hover:text-stone-900 font-semibold text-xs sm:text-sm py-1.5 px-3 rounded-xl hover:bg-stone-100 transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />

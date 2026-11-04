@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { BottomNav, NavTab } from '@/components/layout/BottomNav';
@@ -10,19 +11,10 @@ import { ProductCard } from '@/features/home/components/ProductCard';
 import { CartDrawer } from '@/features/cart/components/CartDrawer';
 import { useHomeData } from '@/features/home/hooks/useHomeData';
 import { Sparkles, SlidersHorizontal, ArrowRight } from 'lucide-react';
+import { WebRoutes } from '@/navigation/routes';
 
-interface HomeScreenProps {
-  onNavigateToCheckout?: () => void;
-  onNavigateToCombos?: () => void;
-  onNavigateToCatalog?: (category?: string) => void;
-}
-
-export const HomeScreen: React.FC<HomeScreenProps> = ({
-  onNavigateToCheckout,
-  onNavigateToCombos,
-  onNavigateToCatalog,
-}) => {
-  const [activeTab, setActiveTab] = useState<NavTab>('catalogo');
+export const HomeScreen: React.FC = () => {
+  const navigate = useNavigate();
   const combosRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -40,20 +32,18 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     combosRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const handleSelectCategory = (cat: string) => {
+    navigate(`${WebRoutes.CATALOG}?categoria=${cat}`);
+  };
+
   return (
     <div className="min-h-screen bg-stone-50/50 flex flex-col">
       {/* Full Width Sticky Header */}
       <Header
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        onScrollToCombos={onNavigateToCombos || handleScrollToCombos}
-        onSelectCategory={(category) => {
-          if (onNavigateToCatalog) {
-            onNavigateToCatalog(category);
-          } else {
-            setActiveCategory(category);
-          }
-        }}
+        onScrollToCombos={() => navigate(WebRoutes.COMBOS)}
+        onSelectCategory={handleSelectCategory}
       />
 
       {/* Main Content Container */}
@@ -62,14 +52,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         <HeroCampaignBanner
           campaign={campaign}
           onExploreClick={handleScrollToCombos}
-          onNavigateToCombos={onNavigateToCombos}
+          onNavigateToCombos={() => navigate(WebRoutes.COMBOS)}
         />
 
         {/* Combos & Gift Sets Section */}
         <div ref={combosRef}>
           <CombosSection
             combos={combos}
-            onViewAllCombos={onNavigateToCombos}
+            onViewAllCombos={() => navigate(WebRoutes.COMBOS)}
           />
         </div>
 
@@ -90,16 +80,15 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             </div>
 
             <div className="flex items-center gap-3">
-              {onNavigateToCatalog && (
-                <button
-                  type="button"
-                  onClick={() => onNavigateToCatalog(activeCategory)}
-                  className="inline-flex items-center gap-2 bg-rose-50 hover:bg-rose-100 text-[#5a061a] border border-rose-200/80 font-bold text-xs sm:text-sm px-4 py-2 rounded-xl transition-all cursor-pointer"
-                >
-                  <span>Ver todas las colecciones</span>
-                  <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => navigate(WebRoutes.CATALOG)}
+                className="inline-flex items-center gap-2 bg-rose-50 hover:bg-rose-100 text-[#5a061a] border border-rose-200/80 font-bold text-xs sm:text-sm px-4 py-2 rounded-xl transition-all cursor-pointer"
+              >
+                <span>Ver todas las colecciones</span>
+                <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+              </button>
+
               <div className="hidden md:flex items-center gap-2 text-xs text-stone-500 font-medium">
                 <SlidersHorizontal className="w-4 h-4 text-stone-400" />
                 <span>{products.length} fragancias destacadas</span>
@@ -140,18 +129,15 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
       {/* Mobile-Only Bottom Navigation */}
       <BottomNav
-        activeTab={activeTab}
-        onTabChange={(tab) => {
-          setActiveTab(tab);
-          if (tab === 'regalos') {
-            if (onNavigateToCombos) onNavigateToCombos();
-            else handleScrollToCombos();
-          }
+        activeTab="catalogo"
+        onTabChange={(tab: NavTab) => {
+          if (tab === 'regalos') navigate(WebRoutes.COMBOS);
+          if (tab === 'catalogo') navigate(WebRoutes.CATALOG);
         }}
       />
 
       {/* Cart Drawer */}
-      <CartDrawer onProceedToCheckout={() => onNavigateToCheckout && onNavigateToCheckout()} />
+      <CartDrawer onProceedToCheckout={() => navigate(WebRoutes.CHECKOUT)} />
     </div>
   );
 };

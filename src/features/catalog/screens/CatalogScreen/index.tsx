@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Sparkles, SlidersHorizontal } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
@@ -6,26 +7,47 @@ import { FloatingCartBar } from '@/components/layout/FloatingCartBar';
 import { CartDrawer } from '@/features/cart/components/CartDrawer';
 import { ProductCard } from '@/features/home/components/ProductCard';
 import { CategoryFilterPills } from '@/features/home/components/CategoryFilterPills';
+import { Pagination } from '@/components/ui/Pagination';
 import { ALL_PRODUCTS } from '../../data/products.data';
+import { WebRoutes } from '@/navigation/routes';
 
-interface CatalogScreenProps {
-  initialCategory?: string;
-  onBack: () => void;
-  onNavigateToCheckout: () => void;
-  onNavigateToCombos: () => void;
-}
+export const CatalogScreen: React.FC = () => {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-export const CatalogScreen: React.FC<CatalogScreenProps> = ({
-  initialCategory = 'Todos',
-  onBack,
-  onNavigateToCheckout,
-  onNavigateToCombos,
-}) => {
+  const categoryFromUrl = searchParams.get('categoria') || 'Todos';
+
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState<string>(initialCategory);
+  const [activeCategory, setActiveCategory] = useState<string>(categoryFromUrl);
   const [sortBy, setSortBy] = useState<'default' | 'price_asc' | 'price_desc'>('default');
 
+  // Paginación (igual que en el panel admin, sin scroll infinito)
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(8);
+
   const categories = ['Todos', 'Femenino', 'Masculino', 'Árabe', 'Unisex'];
+
+  // Sincronizar parámetro URL si cambia externamente
+  useEffect(() => {
+    if (categoryFromUrl) {
+      setActiveCategory(categoryFromUrl);
+    }
+  }, [categoryFromUrl]);
+
+  // Reset a página 1 al cambiar filtros o búsqueda
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeCategory, searchQuery, sortBy]);
+
+  const handleSelectCategory = (cat: string) => {
+    setActiveCategory(cat);
+    if (cat === 'Todos') {
+      searchParams.delete('categoria');
+      setSearchParams(searchParams);
+    } else {
+      setSearchParams({ categoria: cat });
+    }
+  };
 
   const filteredProducts = ALL_PRODUCTS.filter((product) => {
     const matchesCategory =
@@ -42,13 +64,19 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({
     return 0;
   });
 
+  const totalItems = filteredProducts.length;
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
   return (
     <div className="min-h-screen bg-stone-50/50 flex flex-col">
       <Header
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        onScrollToCombos={onNavigateToCombos}
-        onSelectCategory={setActiveCategory}
+        onScrollToCombos={() => navigate(WebRoutes.COMBOS)}
+        onSelectCategory={handleSelectCategory}
       />
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
@@ -56,7 +84,7 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({
         <div className="mb-8">
           <button
             type="button"
-            onClick={onBack}
+            onClick={() => navigate(WebRoutes.HOME)}
             className="inline-flex items-center gap-2 text-stone-600 hover:text-stone-900 font-semibold text-xs sm:text-sm py-1.5 px-3 rounded-xl hover:bg-stone-100 transition-colors cursor-pointer mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -98,30 +126,53 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({
             <CategoryFilterPills
               categories={categories}
               activeCategory={activeCategory}
-              onSelectCategory={setActiveCategory}
+              onSelectCategory={handleSelectCategory}
             />
           </div>
         </div>
 
         {/* Products Grid (4 cols on desktop) */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 sm:gap-6">
-          {filteredProducts.map((product) => (
+          {paginatedProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
 
-        {filteredProducts.length === 0 && (
+        {/* Empty State */}
+        {totalItems === 0 && (
           <div className="py-20 text-center text-stone-400 bg-white rounded-3xl border border-dashed border-stone-200">
             <Sparkles className="w-12 h-12 text-stone-300 mx-auto mb-3" />
             <p className="font-serif text-lg text-stone-700">No hay fragancias que coincidan con tu búsqueda</p>
             <p className="text-xs text-stone-400 mt-1">Prueba cambiando la categoría o usando otro término.</p>
           </div>
         )}
+
+        {/* Pagination Bar Component */}
+        {totalItems > 0 && (
+          <div className="mt-8">
+            <Pagination
+              currentPage={currentPage}
+              totalItems={totalItems}
+              pageSize={pageSize}
+              pageSizeOptions={[8, 12, 16, 24]}
+              onPageChange={(page) => {
+                setCurrentPage(page);
+                window.scrollTo({ top: 180, behavior: 'smooth' });
+              }}
+              onPageSizeChange={(newSize) => {
+                setPageSize(newSize);
+                setCurrentPage(1);
+              }}
+              showPageSizeSelector={true}
+              showInfo={true}
+            />
+          </div>
+        )}
       </main>
 
       <Footer />
       <FloatingCartBar />
-      <CartDrawer onProceedToCheckout={onNavigateToCheckout} />
+      <CartDrawer onProceedToCheckout={() => navigate(WebRoutes.CHECKOUT)} />
     </div>
   );
 };

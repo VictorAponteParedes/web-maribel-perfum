@@ -1,9 +1,23 @@
-import { useState } from 'react';
-import { CampaignBanner, Combo, Product } from '@/types/product.types';
+import { useState, useEffect } from 'react';
+import { CampaignBanner, Product } from '@/types/product.types';
+import { useCategoriesStore } from '@/features/categories/store/useCategoriesStore';
+import { useCombosStore } from '@/features/combos/store/useCombosStore';
 
 export const useHomeData = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('Todos');
+
+  const dbCategories = useCategoriesStore((state) => state.categories);
+  const fetchCategories = useCategoriesStore((state) => state.fetchCategories);
+
+  const rawCombos = useCombosStore((state) => state.combos);
+  const isLoadingCombos = useCombosStore((state) => state.isLoading);
+  const fetchCombos = useCombosStore((state) => state.fetchCombos);
+
+  useEffect(() => {
+    fetchCategories();
+    fetchCombos();
+  }, [fetchCategories, fetchCombos]);
 
   const campaign: CampaignBanner = {
     tag: 'EDICIÓN ESPECIAL ✨',
@@ -11,48 +25,6 @@ export const useHomeData = () => {
     subtitle: 'Envío gratis desde Gs. 250.000 + Caja de lujo Maribel con tarjeta dedicatoria de obsequio.',
     ctaText: 'Ver Colección Especial ✨',
   };
-
-  const combos: Combo[] = [
-    {
-      id: 'combo-duo-sensualite',
-      title: 'Duo Sensualité',
-      kicker: '★ FAVORITO BOUTIQUE',
-      discountBadge: 'Ahorrás Gs. 60.000',
-      savingsAmount: 60000,
-      fragranceCountLabel: '2 Fragancias',
-      description: 'Incluye: Cool Girl EdP 85ml + Mystical Zanzibara 30ml + Mini estuche rígido con listón.',
-      originalPrice: 365000,
-      price: 305000,
-      imageUrl: 'https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=600&q=80',
-      inStock: true,
-    },
-    {
-      id: 'combo-pack-romance',
-      title: 'Pack Romance Florale',
-      kicker: '♥ BOUQUET FLORAL',
-      discountBadge: 'Ahorrás Gs. 45.000',
-      savingsAmount: 45000,
-      fragranceCountLabel: '3 Piezas',
-      description: 'Incluye: Sweet Cherry 85ml + Tartan Silk 30ml + Loción corporal iluminadora perfumada.',
-      originalPrice: 360000,
-      price: 315000,
-      imageUrl: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=600&q=80',
-      inStock: true,
-    },
-    {
-      id: 'combo-duo-imperial',
-      title: 'Duo Imperial Noir',
-      kicker: '✦ ÉXITO EN VENTAS',
-      discountBadge: 'Ahorrás Gs. 50.000',
-      savingsAmount: 50000,
-      fragranceCountLabel: '2 Fragancias',
-      description: 'Incluye: Sauvage Intense 100ml + Bleu Nocturne 30ml travel spray recargable.',
-      originalPrice: 390000,
-      price: 340000,
-      imageUrl: 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&w=600&q=80',
-      inStock: true,
-    },
-  ];
 
   const products: Product[] = [
     {
@@ -104,9 +76,7 @@ export const useHomeData = () => {
     },
   ];
 
-  const categories = ['Todos', 'Combos', 'Femenino', 'Masculino', 'Árabe', 'Unisex'];
-
-  const filteredCombos = combos.filter((combo) => {
+  const filteredCombos = rawCombos.filter((combo) => {
     if (!searchQuery.trim()) return true;
     const query = searchQuery.toLowerCase();
     return (
@@ -119,7 +89,7 @@ export const useHomeData = () => {
     const matchesCategory =
       activeCategory === 'Todos' ||
       activeCategory === 'Combos' ||
-      product.category === activeCategory;
+      product.category?.toLowerCase() === activeCategory.toLowerCase();
 
     if (!matchesCategory) return false;
     if (!searchQuery.trim()) return true;
@@ -134,11 +104,12 @@ export const useHomeData = () => {
   return {
     campaign,
     combos: filteredCombos,
+    isLoadingCombos,
     products: filteredProducts,
     searchQuery,
     setSearchQuery,
     activeCategory,
     setActiveCategory,
-    categories,
+    dbCategories,
   };
 };

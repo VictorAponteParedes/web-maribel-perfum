@@ -4,7 +4,8 @@ import { ArrowLeft, Sparkles, SlidersHorizontal } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { ProductCard } from '@/features/home/components/ProductCard';
-import { CategoryFilterPills } from '@/features/home/components/CategoryFilterPills';
+import { CategoryDropdown } from '@/components';
+import { useCategoriesStore } from '@/features/categories/store/useCategoriesStore';
 import { Pagination } from '@/components/ui/Pagination';
 import { ALL_PRODUCTS } from '../../data/products.data';
 import { WebRoutes } from '@/navigation/routes';
@@ -23,7 +24,12 @@ export const CatalogScreen: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(8);
 
-  const categories = ['Todos', 'Femenino', 'Masculino', 'Árabe', 'Unisex'];
+  const dbCategories = useCategoriesStore((state) => state.categories);
+  const fetchCategories = useCategoriesStore((state) => state.fetchCategories);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   useEffect(() => {
     if (categoryFromUrl) {
@@ -47,7 +53,8 @@ export const CatalogScreen: React.FC = () => {
 
   const filteredProducts = ALL_PRODUCTS.filter((product) => {
     const matchesCategory =
-      activeCategory === 'Todos' || product.category === activeCategory;
+      activeCategory === 'Todos' ||
+      product.category.toLowerCase() === activeCategory.toLowerCase();
 
     if (!matchesCategory) return false;
 
@@ -117,12 +124,13 @@ export const CatalogScreen: React.FC = () => {
             </div>
           </div>
 
-          {/* Category Filter Pills */}
-          <div className="mt-4">
-            <CategoryFilterPills
-              categories={categories}
+          {/* Category Dropdown */}
+          <div className="mt-4 flex items-center justify-between gap-3">
+            <CategoryDropdown
+              categories={dbCategories}
               activeCategory={activeCategory}
               onSelectCategory={handleSelectCategory}
+              totalProductsCount={filteredProducts.length}
             />
           </div>
         </div>

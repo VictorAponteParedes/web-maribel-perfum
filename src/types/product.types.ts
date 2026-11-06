@@ -23,6 +23,13 @@ export interface Combo {
   price: number;
   imageUrl: string;
   inStock: boolean;
+  items?: Array<{
+    productId: string;
+    productName: string;
+    brand: string;
+    quantity: number;
+    originalPrice: number;
+  }>;
 }
 
 export interface CampaignBanner {

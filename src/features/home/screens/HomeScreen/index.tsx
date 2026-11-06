@@ -4,8 +4,8 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { HeroCampaignBanner } from '@/features/home/components/HeroCampaignBanner';
 import { CombosSection } from '@/features/home/components/CombosSection';
-import { CategoryFilterPills } from '@/features/home/components/CategoryFilterPills';
 import { ProductCard } from '@/features/home/components/ProductCard';
+import { CategoryDropdown } from '@/components';
 import { useHomeData } from '@/features/home/hooks/useHomeData';
 import { Sparkles, SlidersHorizontal, ArrowRight } from 'lucide-react';
 import { WebRoutes } from '@/navigation/routes';
@@ -17,12 +17,13 @@ export const HomeScreen: React.FC = () => {
   const {
     campaign,
     combos,
+    isLoadingCombos,
     products,
     searchQuery,
     setSearchQuery,
     activeCategory,
     setActiveCategory,
-    categories,
+    dbCategories,
   } = useHomeData();
 
   const handleScrollToCombos = () => {
@@ -56,6 +57,7 @@ export const HomeScreen: React.FC = () => {
         <div ref={combosRef}>
           <CombosSection
             combos={combos}
+            isLoading={isLoadingCombos}
             onViewAllCombos={() => navigate(WebRoutes.COMBOS)}
           />
         </div>
@@ -93,12 +95,13 @@ export const HomeScreen: React.FC = () => {
             </div>
           </div>
 
-          {/* Category Filter Pills */}
-          <div className="mb-6">
-            <CategoryFilterPills
-              categories={categories}
+          {/* Selector Desplegable de Categorías */}
+          <div className="mb-6 flex items-center justify-between gap-3">
+            <CategoryDropdown
+              categories={dbCategories}
               activeCategory={activeCategory}
               onSelectCategory={setActiveCategory}
+              totalProductsCount={products.length}
             />
           </div>
 

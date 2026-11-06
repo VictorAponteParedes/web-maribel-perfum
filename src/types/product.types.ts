@@ -2,7 +2,7 @@ export interface Product {
   id: string;
   name: string;
   brand: string;
-  category: 'Femenino' | 'Masculino' | 'Unisex' | 'Árabe';
+  category: string;
   volumeMl: number;
   price: number;
   originalPrice?: number;

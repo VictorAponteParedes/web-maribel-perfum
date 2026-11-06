@@ -5,6 +5,7 @@ import { Footer } from '@/components/layout/Footer';
 import { HeroCampaignBanner } from '@/features/home/components/HeroCampaignBanner';
 import { CombosSection } from '@/features/home/components/CombosSection';
 import { ProductCard } from '@/features/home/components/ProductCard';
+import { CatalogSkeleton } from '@/features/catalog';
 import { CategoryDropdown } from '@/components';
 import { useHomeData } from '@/features/home/hooks/useHomeData';
 import { Sparkles, SlidersHorizontal, ArrowRight } from 'lucide-react';
@@ -19,6 +20,7 @@ export const HomeScreen: React.FC = () => {
     combos,
     isLoadingCombos,
     products,
+    isLoadingProducts,
     searchQuery,
     setSearchQuery,
     activeCategory,
@@ -106,13 +108,17 @@ export const HomeScreen: React.FC = () => {
           </div>
 
           {/* Products Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 sm:gap-6">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          {isLoadingProducts ? (
+            <CatalogSkeleton count={4} />
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 sm:gap-6">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          )}
 
-          {products.length === 0 && (
+          {!isLoadingProducts && products.length === 0 && (
             <div className="py-16 text-center text-stone-400 bg-white rounded-2xl border border-dashed border-stone-200">
               <p className="font-serif text-base text-stone-600">No se encontraron fragancias para tu búsqueda</p>
               <p className="text-xs text-stone-400 mt-1">Prueba con otra palabra clave o selecciona otra categoría.</p>

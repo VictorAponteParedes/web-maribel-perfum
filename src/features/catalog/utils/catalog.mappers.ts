@@ -26,13 +26,15 @@ export const mapBackendProductToProduct = (raw: BackendProduct): Product => {
     badge = 'Últimas unidades';
   }
 
-  const imageUrl = raw.image?.url || raw.imageUrl || DEFAULT_PRODUCT_IMAGE;
-
   // Soporte para múltiples imágenes (array de URLs)
   const rawImages = (raw as { images?: string[] }).images;
-  const images = Array.isArray(rawImages) && rawImages.length > 0
+  const resolvedRawImages = Array.isArray(rawImages) && rawImages.length > 0
     ? rawImages.filter((img) => Boolean(img?.trim()))
-    : [imageUrl];
+    : [];
+
+  const imageUrl =
+    resolvedRawImages[0] || raw.imageUrl || raw.image?.url || DEFAULT_PRODUCT_IMAGE;
+  const images = resolvedRawImages.length > 0 ? resolvedRawImages : [imageUrl];
 
   const description = (raw as { description?: string }).description || undefined;
 

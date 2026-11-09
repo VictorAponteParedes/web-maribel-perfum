@@ -17,6 +17,7 @@ export const HomeScreen: React.FC = () => {
 
   const {
     campaign,
+    campaigns,
     combos,
     isLoadingCombos,
     products,
@@ -51,6 +52,7 @@ export const HomeScreen: React.FC = () => {
         {/* Hero Campaign Banner (with Carousel and 4 dots) */}
         <HeroCampaignBanner
           campaign={campaign}
+          campaigns={campaigns}
           onExploreClick={handleScrollToCombos}
           onNavigateToCombos={() => navigate(WebRoutes.COMBOS)}
         />

@@ -1,0 +1,1 @@
+export { useWebSettings } from './useWebSettings';

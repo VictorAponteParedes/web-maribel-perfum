@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShoppingBag, Search, Sparkles, X, MessageCircle, Gift } from 'lucide-react';
 import { useCartStore } from '@/features/cart/store/useCartStore';
+import { useWebSettingsStore } from '@/features/web-settings';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { logoAdmin } from '@/assets';
 import { WebRoutes } from '@/navigation/routes';
@@ -24,9 +25,18 @@ export const Header: React.FC<HeaderProps> = ({
   const totalPrice = useCartStore((state) => state.getTotalPrice());
   const openDrawer = useCartStore((state) => state.openDrawer);
 
+  const settings = useWebSettingsStore((state) => state.settings);
+  const fetchWebSettings = useWebSettingsStore((state) => state.fetchWebSettings);
+  const getCleanWhatsAppNumber = useWebSettingsStore((state) => state.getCleanWhatsAppNumber);
+
+  useEffect(() => {
+    fetchWebSettings();
+  }, [fetchWebSettings]);
+
   const handleWhatsappAdvisor = () => {
+    const phone = getCleanWhatsAppNumber();
     window.open(
-      'https://wa.me/595981000000?text=Hola%20Maribel%20Perfumer%C3%ADa,%20me%20gustar%C3%ADa%20recibir%20asesor%C3%ADa%20personalizada%20sobre%20fragancias%20y%20regalos',
+      `https://wa.me/${phone}?text=Hola%20Maribel%20Perfumer%C3%ADa,%20me%20gustar%C3%ADa%20recibir%20asesor%C3%ADa%20personalizada%20sobre%20fragancias%20y%20regalos`,
       '_blank'
     );
   };
@@ -55,12 +65,12 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-stone-200/80 shadow-xs">
       {/* Top Luxury Announcement Bar */}
-      <div className="bg-gradient-to-r from-[#5a061a] via-[#750c25] to-[#5a061a] text-white text-[11px] sm:text-xs py-2 px-4 text-center font-medium tracking-wide flex items-center justify-center gap-2">
-        <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-        <span>
-          Envíos a todo el país · <strong>Caja de lujo de obsequio</strong> con tarjeta dedicatoria en compras desde Gs. 250.000
-        </span>
-      </div>
+      {settings.announcementActive && (
+        <div className="bg-gradient-to-r from-[#5a061a] via-[#750c25] to-[#5a061a] text-white text-[11px] sm:text-xs py-2 px-4 text-center font-medium tracking-wide flex items-center justify-center gap-2">
+          <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+          <span>{settings.announcementText}</span>
+        </div>
+      )}
 
       {/* Main Navigation Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
@@ -71,14 +81,14 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden shadow-md shadow-[#5a061a]/25 flex-shrink-0 border border-stone-200/80 group-hover:scale-105 transition-transform">
             <img
-              src={logoAdmin}
-              alt="Maribel Perfum Icono"
+              src={settings.logoUrl || logoAdmin}
+              alt={settings.tradeName || 'Maribel Perfum'}
               className="w-full h-full object-cover"
             />
           </div>
           <div className="flex flex-col">
             <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#5a061a] leading-none">
-              Maribel Perfum
+              {settings.tradeName || 'Maribel Perfum'}
             </h1>
             <span className="text-[9.5px] sm:text-[10px] font-bold tracking-[0.25em] text-[#9b7036] uppercase mt-1">
               Alta Perfumería & Regalos

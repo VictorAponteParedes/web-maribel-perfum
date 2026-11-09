@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { CampaignBanner } from '@/types/product.types';
 import { useCategoriesStore } from '@/features/categories/store/useCategoriesStore';
 import { useCombosStore } from '@/features/combos/store/useCombosStore';
 import { useCatalogStore } from '@/features/catalog/store/useCatalogStore';
+import { useWebSettingsStore } from '@/features/web-settings';
 
 export const useHomeData = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -19,18 +20,37 @@ export const useHomeData = () => {
   const isLoadingProducts = useCatalogStore((state) => state.isLoading);
   const fetchProducts = useCatalogStore((state) => state.fetchProducts);
 
+  const settings = useWebSettingsStore((state) => state.settings);
+  const campaigns = useWebSettingsStore((state) => state.campaigns);
+  const fetchWebSettings = useWebSettingsStore((state) => state.fetchWebSettings);
+
   useEffect(() => {
     fetchCategories();
     fetchCombos();
     fetchProducts();
-  }, [fetchCategories, fetchCombos, fetchProducts]);
+    fetchWebSettings();
+  }, [fetchCategories, fetchCombos, fetchProducts, fetchWebSettings]);
 
-  const campaign: CampaignBanner = {
-    tag: 'EDICIÓN ESPECIAL ✨',
-    title: 'Regalos que enamoran · Fragancias Exclusivas',
-    subtitle: 'Envío gratis desde Gs. 250.000 + Caja de lujo Maribel con tarjeta dedicatoria de obsequio.',
-    ctaText: 'Ver Colección Especial ✨',
-  };
+  const campaign: CampaignBanner = useMemo(() => {
+    if (campaigns && campaigns.length > 0) {
+      const top = campaigns[0];
+      return {
+        tag: top.tag || 'EDICIÓN ESPECIAL ✨',
+        title: top.title || 'Regalos que enamoran · Fragancias Exclusivas',
+        subtitle:
+          top.subtitle ||
+          `Envío gratis desde Gs. ${settings.freeShippingThreshold.toLocaleString('es-PY')} + Caja de lujo Maribel con tarjeta dedicatoria de obsequio.`,
+        ctaText: top.buttonText || 'Ver Colección Especial ✨',
+      };
+    }
+
+    return {
+      tag: 'EDICIÓN ESPECIAL ✨',
+      title: 'Regalos que enamoran · Fragancias Exclusivas',
+      subtitle: `Envío gratis desde Gs. ${settings.freeShippingThreshold.toLocaleString('es-PY')} + Caja de lujo Maribel con tarjeta dedicatoria de obsequio.`,
+      ctaText: 'Ver Colección Especial ✨',
+    };
+  }, [campaigns, settings.freeShippingThreshold]);
 
   const filteredCombos = rawCombos.filter((combo) => {
     if (!searchQuery.trim()) return true;
@@ -59,6 +79,8 @@ export const useHomeData = () => {
 
   return {
     campaign,
+    campaigns,
+    settings,
     combos: filteredCombos,
     isLoadingCombos,
     products: filteredProducts,

@@ -1,45 +1,47 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Sparkles, ArrowRight, Gift, ShieldCheck, HeartHandshake } from 'lucide-react';
 import { CampaignBanner } from '@/types/product.types';
+import { WebCampaign } from '@/features/web-settings';
 
 interface HeroCampaignBannerProps {
   campaign: CampaignBanner;
+  campaigns?: WebCampaign[];
   onExploreClick?: () => void;
   onNavigateToCombos?: () => void;
 }
 
 interface HeroSlide {
-  id: number;
+  id: string | number;
   badge: string;
   title: string;
   subtitle: string;
   imageUrl: string;
 }
 
-const HERO_SLIDES: HeroSlide[] = [
+const DEFAULT_SLIDES: HeroSlide[] = [
   {
-    id: 0,
+    id: 'default-0',
     badge: '★ SET DESTACADO DEL MES',
     title: 'Duo Sensualité & Estuche Velvet',
     subtitle: 'Ahorro de Gs. 60.000 incluido en caja rígida',
     imageUrl: 'https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=700&q=80',
   },
   {
-    id: 1,
+    id: 'default-1',
     badge: '♥ BOUQUET FLORAL',
     title: 'Pack Romance Florale & Glow',
     subtitle: 'Fragancia EdP + Loción corporal de obsequio',
     imageUrl: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&w=700&q=80',
   },
   {
-    id: 2,
+    id: 'default-2',
     badge: '✦ ÉXITO EN VENTAS',
     title: 'Duo Imperial Noir & Travel Spray',
     subtitle: 'Sauvage Intense 100ml + atomizador recargable',
     imageUrl: 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&w=700&q=80',
   },
   {
-    id: 3,
+    id: 'default-3',
     badge: '✨ COLECCIÓN ÁRABE',
     title: 'Khamrah Qahwa & Oud Royale',
     subtitle: 'Fragancias orientales de fijación superior 24hs',
@@ -49,20 +51,37 @@ const HERO_SLIDES: HeroSlide[] = [
 
 export const HeroCampaignBanner: React.FC<HeroCampaignBannerProps> = ({
   campaign,
+  campaigns = [],
   onExploreClick,
   onNavigateToCombos,
 }) => {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
+  const slides: HeroSlide[] = useMemo(() => {
+    if (campaigns && campaigns.length > 0) {
+      return campaigns.map((c, idx) => ({
+        id: c.id || `campaign-${idx}`,
+        badge: c.tag || '★ CAMPAÑA DESTACADA',
+        title: c.title,
+        subtitle: c.subtitle,
+        imageUrl:
+          c.imageUrl ||
+          DEFAULT_SLIDES[idx % DEFAULT_SLIDES.length].imageUrl,
+      }));
+    }
+    return DEFAULT_SLIDES;
+  }, [campaigns]);
+
   // Auto-play cada 4.5 segundos
   useEffect(() => {
+    if (slides.length <= 1) return;
     const timer = setInterval(() => {
-      setCurrentSlideIndex((prev) => (prev + 1) % HERO_SLIDES.length);
+      setCurrentSlideIndex((prev) => (prev + 1) % slides.length);
     }, 4500);
     return () => clearInterval(timer);
-  }, []);
+  }, [slides.length]);
 
-  const currentSlide = HERO_SLIDES[currentSlideIndex];
+  const currentSlide = slides[currentSlideIndex] || slides[0];
 
   return (
     <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#720c24] via-[#5c081c] to-[#30030c] text-white shadow-2xl shadow-rose-950/20 my-4 md:my-6">
@@ -156,9 +175,9 @@ export const HeroCampaignBanner: React.FC<HeroCampaignBannerProps> = ({
                   </span>
                 </div>
 
-                {/* 4 Interactive Dots Carousel Indicator */}
+                {/* Interactive Dots Carousel Indicator */}
                 <div className="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-2 z-20">
-                  {HERO_SLIDES.map((slide, index) => {
+                  {slides.map((slide, index) => {
                     const isActive = index === currentSlideIndex;
                     return (
                       <button

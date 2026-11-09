@@ -7,6 +7,8 @@ interface ProductDetailInfoProps {
   category?: string | { name?: string };
   price: number;
   originalPrice?: number;
+  stock?: number;
+  showStockInWeb?: boolean;
 }
 
 export const ProductDetailInfo: React.FC<ProductDetailInfoProps> = ({
@@ -15,6 +17,8 @@ export const ProductDetailInfo: React.FC<ProductDetailInfoProps> = ({
   category,
   price,
   originalPrice,
+  stock,
+  showStockInWeb = true,
 }) => {
   const displayBrand =
     typeof brand === 'object' && brand !== null
@@ -37,14 +41,23 @@ export const ProductDetailInfo: React.FC<ProductDetailInfoProps> = ({
       </h1>
 
       {/* Categoría & Disponibilidad */}
-      <div className="flex items-center gap-3 mt-3">
+      <div className="flex flex-wrap items-center gap-3 mt-3">
         <span className="inline-block px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-600 text-xs font-medium">
           {displayCategory}
         </span>
-        <span className="inline-flex items-center gap-1.5 text-xs text-emerald-700 font-semibold">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          Disponible en boutique
-        </span>
+        {stock !== undefined && stock <= 0 ? (
+          <span className="inline-flex items-center gap-1.5 text-xs text-rose-700 font-semibold">
+            <span className="w-2 h-2 rounded-full bg-rose-500" />
+            Agotado temporalmente
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1.5 text-xs text-emerald-700 font-semibold">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            {showStockInWeb && stock !== undefined
+              ? `Disponible en boutique (${stock} uds en stock)`
+              : 'Disponible en boutique'}
+          </span>
+        )}
       </div>
 
       {/* Precio & Opciones de Pago */}

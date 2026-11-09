@@ -29,6 +29,9 @@ export interface WebStoreSettings {
   announcementText: string;
   announcementActive: boolean;
   freeShippingThreshold: number;
+  showStockInWeb: boolean;
+  lowStockThreshold: number;
+  blockOutOfStockOrders: boolean;
   bankDetails: BankDetail[];
   deliveryRates: DeliveryRate[];
 }

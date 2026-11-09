@@ -3,6 +3,9 @@ import { ShoppingBag, Check, MessageCircle } from 'lucide-react';
 
 interface ProductDetailActionsProps {
   quantity: number;
+  maxAvailable?: number;
+  totalStock?: number;
+  cartQty?: number;
   onQuantityChange: (qty: number) => void;
   onAddToCart: () => void;
   isAdded: boolean;
@@ -11,11 +14,18 @@ interface ProductDetailActionsProps {
 
 export const ProductDetailActions: React.FC<ProductDetailActionsProps> = ({
   quantity,
+  maxAvailable = 99,
+  totalStock = 99,
+  cartQty = 0,
   onQuantityChange,
   onAddToCart,
   isAdded,
   whatsappUrl,
 }) => {
+  const isOutOfStock = totalStock <= 0;
+  const isMaxInCart = !isOutOfStock && maxAvailable <= 0;
+  const reachedMax = !isOutOfStock && !isMaxInCart && quantity >= maxAvailable;
+
   return (
     <div className="mt-6 space-y-3">
       <div className="flex items-center gap-3">
@@ -24,18 +34,19 @@ export const ProductDetailActions: React.FC<ProductDetailActionsProps> = ({
           <button
             type="button"
             onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
-            disabled={quantity <= 1}
+            disabled={quantity <= 1 || isOutOfStock || isMaxInCart}
             className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-stone-100 text-stone-700 disabled:opacity-40 transition-colors font-bold cursor-pointer"
           >
             -
           </button>
           <span className="w-10 text-center font-bold text-sm text-stone-900">
-            {quantity}
+            {isOutOfStock || isMaxInCart ? 0 : quantity}
           </span>
           <button
             type="button"
-            onClick={() => onQuantityChange(quantity + 1)}
-            className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-stone-100 text-stone-700 transition-colors font-bold cursor-pointer"
+            onClick={() => onQuantityChange(Math.min(maxAvailable, quantity + 1))}
+            disabled={quantity >= maxAvailable || isOutOfStock || isMaxInCart}
+            className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-stone-100 text-stone-700 disabled:opacity-40 transition-colors font-bold cursor-pointer"
           >
             +
           </button>
@@ -45,13 +56,20 @@ export const ProductDetailActions: React.FC<ProductDetailActionsProps> = ({
         <button
           type="button"
           onClick={onAddToCart}
-          className={`flex-1 py-3 px-6 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all active:scale-95 shadow-md cursor-pointer ${
-            isAdded
-              ? 'bg-emerald-600 text-white shadow-emerald-600/30'
-              : 'bg-[#5a061a] hover:bg-[#720a23] text-white shadow-[#5a061a]/25'
+          disabled={isOutOfStock || isMaxInCart}
+          className={`flex-1 py-3 px-6 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all active:scale-95 shadow-md ${
+            isOutOfStock || isMaxInCart
+              ? 'bg-stone-200 text-stone-500 cursor-not-allowed shadow-none'
+              : isAdded
+              ? 'bg-emerald-600 text-white shadow-emerald-600/30 cursor-pointer'
+              : 'bg-[#5a061a] hover:bg-[#720a23] text-white shadow-[#5a061a]/25 cursor-pointer'
           }`}
         >
-          {isAdded ? (
+          {isOutOfStock ? (
+            <span>Producto Agotado</span>
+          ) : isMaxInCart ? (
+            <span>Máximo en tu bolsa ({totalStock} uds)</span>
+          ) : isAdded ? (
             <>
               <Check className="w-5 h-5" />
               <span>¡Agregado a tu Bolsa!</span>
@@ -64,6 +82,13 @@ export const ProductDetailActions: React.FC<ProductDetailActionsProps> = ({
           )}
         </button>
       </div>
+
+      {(reachedMax || isMaxInCart) && totalStock > 0 && (
+        <p className="text-xs font-medium text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
+          Solo contamos con <strong>{totalStock} unidades</strong> en stock de esta fragancia
+          {cartQty > 0 ? ` (ya tienes ${cartQty} en tu bolsa)` : ''}.
+        </p>
+      )}
 
       {/* Botón WhatsApp */}
       <a

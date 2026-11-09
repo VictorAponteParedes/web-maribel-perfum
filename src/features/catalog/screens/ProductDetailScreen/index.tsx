@@ -21,7 +21,13 @@ import {
 export const ProductDetailScreen: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const addItem = useCartStore((state) => state.addItem);
+  const cartQty = useCartStore(
+    (state) => state.items.find((i) => i.id === id)?.quantity ?? 0
+  );
   const getCleanWhatsAppNumber = useWebSettingsStore((state) => state.getCleanWhatsAppNumber);
+  const showStockInWeb = useWebSettingsStore(
+    (state) => state.settings.showStockInWeb ?? true
+  );
 
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -74,20 +80,30 @@ export const ProductDetailScreen: React.FC = () => {
       ? product.images
       : [product.imageUrl];
 
+  const remainingStock = Math.max(0, product.stock - cartQty);
+
   const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
-      addItem({
+    if (remainingStock <= 0) return;
+    const qtyToAdd = Math.min(quantity, remainingStock);
+    const success = addItem(
+      {
         id: product.id,
+        barcode: product.barcode,
         type: 'product',
         title: product.name,
         subtitle: `${product.brand} · ${product.volumeMl}ml`,
         price: product.price,
         originalPrice: product.originalPrice,
         imageUrl: product.imageUrl,
-      });
+        stock: product.stock,
+      },
+      qtyToAdd
+    );
+    if (success) {
+      setQuantity(1);
+      setAdded(true);
+      setTimeout(() => setAdded(false), 1500);
     }
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
   };
 
   const whatsappClean = getCleanWhatsAppNumber();
@@ -123,10 +139,15 @@ export const ProductDetailScreen: React.FC = () => {
               category={product.category}
               price={product.price}
               originalPrice={product.originalPrice}
+              stock={product.stock}
+              showStockInWeb={showStockInWeb}
             />
 
             <ProductDetailActions
               quantity={quantity}
+              maxAvailable={remainingStock}
+              totalStock={product.stock}
+              cartQty={cartQty}
               onQuantityChange={setQuantity}
               onAddToCart={handleAddToCart}
               isAdded={added}

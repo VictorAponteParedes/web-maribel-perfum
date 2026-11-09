@@ -1,5 +1,6 @@
 export interface CartItem {
   id: string;
+  barcode?: string;
   type: 'product' | 'combo';
   title: string;
   subtitle?: string;
@@ -7,4 +8,5 @@ export interface CartItem {
   originalPrice?: number;
   imageUrl: string;
   quantity: number;
+  stock?: number;
 }

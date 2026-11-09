@@ -27,6 +27,9 @@ export const DEFAULT_WEB_SETTINGS: WebStoreSettings = {
     'Envíos a todo el país · Caja de lujo de obsequio con tarjeta dedicatoria en compras desde Gs. 250.000',
   announcementActive: true,
   freeShippingThreshold: 250000,
+  showStockInWeb: true,
+  lowStockThreshold: 5,
+  blockOutOfStockOrders: true,
   bankDetails: [],
   deliveryRates: [],
 };
@@ -67,6 +70,17 @@ export const webSettingsService = {
       freeShippingThreshold: Number(
         rawSettings.freeShippingThreshold || DEFAULT_WEB_SETTINGS.freeShippingThreshold
       ),
+      showStockInWeb:
+        rawSettings.showStockInWeb !== undefined
+          ? Boolean(rawSettings.showStockInWeb)
+          : true,
+      lowStockThreshold: Number(
+        rawSettings.lowStockThreshold || DEFAULT_WEB_SETTINGS.lowStockThreshold
+      ),
+      blockOutOfStockOrders:
+        rawSettings.blockOutOfStockOrders !== undefined
+          ? Boolean(rawSettings.blockOutOfStockOrders)
+          : true,
       bankDetails: rawSettings.bankDetails || [],
       deliveryRates: rawSettings.deliveryRates || [],
     };

@@ -31,7 +31,7 @@ export const buildOrderPayload = (
     const brand = item.subtitle?.split('·')[0]?.trim() || 'Maribel Perfum';
 
     return {
-      barcode: item.id.toUpperCase(),
+      barcode: (item.barcode || item.id).trim(),
       brand,
       name: item.title,
       size,

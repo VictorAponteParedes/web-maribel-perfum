@@ -56,6 +56,7 @@ export const mapBackendProductToProduct = (raw: BackendProduct): Product => {
 
   return {
     id: raw.id,
+    barcode: raw.barcode || raw.id,
     name: raw.name,
     brand: brandName,
     category: categoryName,

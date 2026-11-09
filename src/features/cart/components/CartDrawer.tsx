@@ -15,6 +15,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onProceedToCheckout }) =
   const isDrawerOpen = useCartStore((state) => state.isDrawerOpen);
   const closeDrawer = useCartStore((state) => state.closeDrawer);
   const items = useCartStore((state) => state.items);
+  const stockWarning = useCartStore((state) => state.stockWarning);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const removeItem = useCartStore((state) => state.removeItem);
   const totalPrice = useCartStore((state) => state.getTotalPrice());
@@ -102,6 +103,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onProceedToCheckout }) =
 
               {/* Items List */}
               <div className="flex-1 overflow-y-auto px-5 py-4 divide-y divide-stone-200/80">
+                {stockWarning && (
+                  <div className="mb-3 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-medium">
+                    {stockWarning}
+                  </div>
+                )}
                 {items.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center p-6 text-stone-400">
                     <ShoppingBag className="w-12 h-12 stroke-[1.2] text-stone-300 mb-3" />
@@ -136,6 +142,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onProceedToCheckout }) =
                               {formatCurrency(item.originalPrice)}
                             </span>
                           )}
+                          {item.stock !== undefined && (
+                            <span className="text-[10px] font-semibold text-stone-500">
+                              · Máx: {item.stock} uds
+                            </span>
+                          )}
                         </div>
                       </div>
 
@@ -154,7 +165,13 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onProceedToCheckout }) =
                         <button
                           type="button"
                           onClick={() => updateQuantity(item.id, 1)}
-                          className="w-6 h-6 flex items-center justify-center text-stone-600 hover:text-stone-900 active:scale-90 cursor-pointer"
+                          disabled={item.stock !== undefined && item.quantity >= item.stock}
+                          title={
+                            item.stock !== undefined && item.quantity >= item.stock
+                              ? `Stock máximo alcanzado (${item.stock} uds)`
+                              : 'Aumentar cantidad'
+                          }
+                          className="w-6 h-6 flex items-center justify-center text-stone-600 hover:text-stone-900 active:scale-90 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
                         >
                           <Plus className="w-3.5 h-3.5" />
                         </button>

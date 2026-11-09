@@ -1,64 +1,32 @@
-import React from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
-import { PageTransition } from '@/components/layout/PageTransition';
-import { BottomNav } from '@/components/layout/BottomNav';
-import { FloatingCartBar } from '@/components/layout/FloatingCartBar';
-import { CartDrawer } from '@/features/cart/components/CartDrawer';
-import { HomeScreen } from '@/features/home';
-import { CombosScreen } from '@/features/combos';
-import { CatalogScreen } from '@/features/catalog';
-import { CheckoutScreen } from '@/features/checkout';
+import React, { Suspense } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { WebLayout } from './WebLayout';
 import { WebRoutes } from './routes';
+import type { RouteConfig } from './types';
+import { HOME_ROUTES } from '@/features/home/routes';
+import { COMBOS_ROUTES } from '@/features/combos/routes';
+import { CATALOG_ROUTES } from '@/features/catalog/routes';
+import { CHECKOUT_ROUTES } from '@/features/checkout/routes';
+
+export const ALL_APP_ROUTES: RouteConfig[] = [
+  ...HOME_ROUTES,
+  ...COMBOS_ROUTES,
+  ...CATALOG_ROUTES,
+  ...CHECKOUT_ROUTES,
+];
 
 export const AppRoutes: React.FC = () => {
-  const location = useLocation();
-
   return (
-    <div className="relative min-h-screen flex flex-col">
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route
-            path={WebRoutes.HOME}
-            element={
-              <PageTransition key="home">
-                <HomeScreen />
-              </PageTransition>
-            }
-          />
-          <Route
-            path={WebRoutes.COMBOS}
-            element={
-              <PageTransition key="combos">
-                <CombosScreen />
-              </PageTransition>
-            }
-          />
-          <Route
-            path={WebRoutes.CATALOG}
-            element={
-              <PageTransition key="catalogo">
-                <CatalogScreen />
-              </PageTransition>
-            }
-          />
-          <Route
-            path={WebRoutes.CHECKOUT}
-            element={
-              <PageTransition key="checkout">
-                <CheckoutScreen />
-              </PageTransition>
-            }
-          />
+    <Suspense fallback={null}>
+      <Routes>
+        <Route element={<WebLayout />}>
+          {ALL_APP_ROUTES.map((route) => (
+            <Route key={route.path} path={route.path} element={route.element} />
+          ))}
           <Route path="*" element={<Navigate to={WebRoutes.HOME} replace />} />
-        </Routes>
-      </AnimatePresence>
-
-      {/* Componentes persistentes en todas las vistas */}
-      <FloatingCartBar />
-      <BottomNav />
-      <CartDrawer />
-    </div>
+        </Route>
+      </Routes>
+    </Suspense>
   );
 };
 

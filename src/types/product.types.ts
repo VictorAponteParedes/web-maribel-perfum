@@ -7,6 +7,8 @@ export interface Product {
   price: number;
   originalPrice?: number;
   imageUrl: string;
+  images?: string[];
+  description?: string;
   stock: number;
   badge?: string;
 }
@@ -22,6 +24,7 @@ export interface Combo {
   originalPrice: number;
   price: number;
   imageUrl: string;
+  images?: string[];
   inStock: boolean;
   items?: Array<{
     productId: string;

@@ -1,5 +1,6 @@
 // Screens
 export { CombosScreen } from './screens/CombosScreen';
+export { ComboDetailScreen } from './screens/ComboDetailScreen';
 
 // Components
 export * from './components';

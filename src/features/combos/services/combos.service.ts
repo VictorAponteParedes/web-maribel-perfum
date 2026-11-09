@@ -50,6 +50,11 @@ export const mapBackendComboToCombo = (raw: BackendCombo): Combo => {
     raw.imageUrl ||
     'https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=600&q=80';
 
+  const rawImages = (raw as { images?: string[] }).images;
+  const images = Array.isArray(rawImages) && rawImages.length > 0
+    ? rawImages.filter((img) => Boolean(img?.trim()))
+    : [resolvedImage];
+
   return {
     id: raw.id,
     title: raw.title,
@@ -61,6 +66,7 @@ export const mapBackendComboToCombo = (raw: BackendCombo): Combo => {
     originalPrice,
     price,
     imageUrl: resolvedImage,
+    images,
     inStock: raw.isActive,
     items,
   };

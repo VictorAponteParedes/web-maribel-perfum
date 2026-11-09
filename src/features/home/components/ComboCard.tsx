@@ -1,19 +1,30 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Check } from 'lucide-react';
+import { Plus, Check, Eye } from 'lucide-react';
 import { Combo } from '@/types/product.types';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { useCartStore } from '@/features/cart/store/useCartStore';
+import { ProductImageCarousel } from '@/components/ProductImageCarousel';
+import { getComboDetailRoute } from '@/navigation/routes';
 
 interface ComboCardProps {
   combo: Combo;
 }
 
 export const ComboCard: React.FC<ComboCardProps> = ({ combo }) => {
+  const navigate = useNavigate();
   const [justAdded, setJustAdded] = useState(false);
   const addItem = useCartStore((state) => state.addItem);
 
-  const handleAddToCart = () => {
+  const images = (combo.images && combo.images.length > 0)
+    ? combo.images
+    : combo.imageUrl
+    ? [combo.imageUrl]
+    : [];
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
     addItem({
       id: combo.id,
       type: 'combo',
@@ -28,38 +39,53 @@ export const ComboCard: React.FC<ComboCardProps> = ({ combo }) => {
     setTimeout(() => setJustAdded(false), 1200);
   };
 
+  const handleNavigateDetail = () => {
+    navigate(getComboDetailRoute(combo.id));
+  };
+
   return (
     <motion.article
       whileHover={{ y: -5 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
-      className="w-full bg-white rounded-2xl border border-stone-200/90 shadow-xs hover:shadow-xl transition-shadow duration-300 flex flex-col overflow-hidden group"
+      onClick={handleNavigateDetail}
+      className="w-full bg-white rounded-2xl border border-stone-200/90 shadow-xs hover:shadow-xl transition-shadow duration-300 flex flex-col overflow-hidden group cursor-pointer"
     >
-      {/* Image Container with Badges */}
-      <div className="relative aspect-[16/10] bg-stone-100 overflow-hidden">
-        <img
-          src={combo.imageUrl}
+      {/* Image Carousel Container with Badges */}
+      <div className="relative">
+        <ProductImageCarousel
+          images={images}
           alt={combo.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-          loading="lazy"
+          aspectRatioClass="aspect-[16/10]"
+          onImageClick={handleNavigateDetail}
         />
 
         {/* Top-Left Savings Badge */}
-        <div className="absolute top-3 left-3 bg-[#fef2e8]/95 backdrop-blur-sm border border-[#fed7aa] text-[#9a3412] text-xs font-bold px-3 py-1 rounded-lg shadow-sm">
-          {combo.discountBadge}
-        </div>
+        {combo.discountBadge && (
+          <div className="absolute top-3 left-3 z-10 bg-[#fef2e8]/95 backdrop-blur-sm border border-[#fed7aa] text-[#9a3412] text-xs font-bold px-3 py-1 rounded-lg shadow-sm pointer-events-none">
+            {combo.discountBadge}
+          </div>
+        )}
 
         {/* Bottom-Right Fragrance Count Badge */}
-        <div className="absolute bottom-3 right-3 bg-white/95 backdrop-blur-sm text-stone-800 text-xs font-bold px-2.5 py-1 rounded-md shadow-sm">
-          {combo.fragranceCountLabel}
-        </div>
+        {combo.fragranceCountLabel && (
+          <div className="absolute bottom-3 right-3 z-10 bg-white/95 backdrop-blur-sm text-stone-800 text-xs font-bold px-2.5 py-1 rounded-md shadow-sm pointer-events-none">
+            {combo.fragranceCountLabel}
+          </div>
+        )}
       </div>
 
       {/* Details Container */}
       <div className="p-5 flex flex-col flex-1">
-        {/* Kicker */}
-        <span className="text-[#9b7036] text-[11px] font-bold tracking-wider uppercase mb-1">
-          {combo.kicker}
-        </span>
+        <div className="flex items-center justify-between mb-1">
+          {/* Kicker */}
+          <span className="text-[#9b7036] text-[11px] font-bold tracking-wider uppercase">
+            {combo.kicker}
+          </span>
+          <span className="text-[11px] text-stone-400 flex items-center gap-1 group-hover:text-[#5a061a] transition-colors">
+            <Eye className="w-3 h-3" />
+            <span className="hidden sm:inline">Ver set</span>
+          </span>
+        </div>
 
         {/* Title */}
         <h3 className="font-serif text-xl font-bold text-stone-900 leading-snug group-hover:text-[#5a061a] transition-colors">
@@ -100,7 +126,7 @@ export const ComboCard: React.FC<ComboCardProps> = ({ combo }) => {
             ) : (
               <>
                 <Plus className="w-4 h-4" />
-                <span>Llevar Combo</span>
+                <span>Agregar</span>
               </>
             )}
           </button>

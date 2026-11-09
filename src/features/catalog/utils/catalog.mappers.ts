@@ -28,15 +28,41 @@ export const mapBackendProductToProduct = (raw: BackendProduct): Product => {
 
   const imageUrl = raw.image?.url || raw.imageUrl || DEFAULT_PRODUCT_IMAGE;
 
+  // Soporte para múltiples imágenes (array de URLs)
+  const rawImages = (raw as { images?: string[] }).images;
+  const images = Array.isArray(rawImages) && rawImages.length > 0
+    ? rawImages.filter((img) => Boolean(img?.trim()))
+    : [imageUrl];
+
+  const description = (raw as { description?: string }).description || undefined;
+
+  // Extraer nombre de marca de forma segura (objeto o string)
+  let brandName = 'Maribel Perfum';
+  if (typeof raw.brand === 'object' && raw.brand !== null) {
+    brandName = (raw.brand as { name?: string }).name || 'Maribel Perfum';
+  } else if (typeof raw.brand === 'string') {
+    brandName = raw.brand;
+  }
+
+  // Extraer nombre de categoría de forma segura (objeto o string)
+  let categoryName = 'Fragancias';
+  if (typeof raw.category === 'object' && raw.category !== null) {
+    categoryName = (raw.category as { name?: string }).name || 'Fragancias';
+  } else if (typeof raw.category === 'string') {
+    categoryName = raw.category;
+  }
+
   return {
     id: raw.id,
     name: raw.name,
-    brand: raw.brand || 'Maribel Perfum',
-    category: raw.category || 'Fragancias',
+    brand: brandName,
+    category: categoryName,
     volumeMl: parseVolumeMl(raw.size),
     price: finalPrice,
     originalPrice,
     imageUrl,
+    images,
+    description,
     stock,
     badge,
   };

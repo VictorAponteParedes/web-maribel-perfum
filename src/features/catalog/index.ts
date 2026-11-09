@@ -1,5 +1,6 @@
 // Screens
 export { CatalogScreen } from './screens/CatalogScreen';
+export { ProductDetailScreen } from './screens/ProductDetailScreen';
 
 // Components
 export * from './components';

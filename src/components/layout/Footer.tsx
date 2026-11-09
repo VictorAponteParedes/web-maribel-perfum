@@ -3,7 +3,7 @@ import { MessageCircle, ShieldCheck, Truck, Gift, Heart, MapPin } from 'lucide-r
 import { logoAdmin } from '@/assets';
 import { useWebSettingsStore } from '@/features/web-settings';
 import { formatCurrency } from '@/utils/formatCurrency';
-import { StoreLocationModal } from './StoreLocationModal';
+import { StoreLocationModal } from '@/components/StoreLocationModal';
 
 const InstagramIcon: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

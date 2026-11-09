@@ -15,6 +15,3 @@ export * from './types';
 
 // Utils
 export * from './utils';
-
-// Routes
-export * from './routes';
